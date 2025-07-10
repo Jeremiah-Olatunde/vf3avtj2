@@ -60,3 +60,18 @@ import * as A from "fp-ts/ReadonlyArray";
     assert.deepStrictEqual(inspect, E.left("ErrorNoneValue"));
   }
 }
+
+{
+  // either.toUnion
+  {
+    const either: E.Either<"Left", "Right"> = E.left("Left");
+    const inspect = E.toUnion(either);
+    assert.deepStrictEqual(inspect, "Left");
+  }
+
+  {
+    const either: E.Either<"Left", "Right"> = E.right("Right");
+    const inspect = E.toUnion(either);
+    assert.deepStrictEqual(inspect, "Right");
+  }
+}
