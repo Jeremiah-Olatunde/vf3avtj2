@@ -1,5 +1,7 @@
 import assert from "node:assert";
 import * as E from "fp-ts/Either";
+import * as F from "fp-ts/function";
+import * as A from "fp-ts/ReadonlyArray";
 
 {
   // tap
@@ -36,9 +38,25 @@ import * as E from "fp-ts/Either";
     const inspect = E.fromNullable("ErrorNullValue")(undefined);
     assert.deepStrictEqual(inspect, E.left("ErrorNullValue"));
   }
+
   {
     const name = "Jeremiah Olatunde";
     const inspect = E.fromNullable("ErrorNullValue")({ name });
     assert.deepStrictEqual(inspect, E.right({ name }));
+  }
+}
+
+{
+  // either.fromOption
+  {
+    const xs: readonly number[] = [0, 1, 2];
+    const inspect = E.fromOption(F.constant("ErrorNoneValue"))(A.head(xs));
+    assert.deepStrictEqual(inspect, E.right(0));
+  }
+
+  {
+    const xs: readonly number[] = [];
+    const inspect = E.fromOption(F.constant("ErrorNoneValue"))(A.head(xs));
+    assert.deepStrictEqual(inspect, E.left("ErrorNoneValue"));
   }
 }
