@@ -75,3 +75,88 @@ import * as A from "fp-ts/ReadonlyArray";
     assert.deepStrictEqual(inspect, "Right");
   }
 }
+
+{
+  // either.apS
+  {
+    type ErrorLeft = "LeftA" | "LeftB";
+    type EitherA = E.Either<ErrorLeft, { rightA: "RightA" }>;
+    type EitherB = E.Either<ErrorLeft, "RightB">;
+
+    const rightA: EitherA = E.right({ rightA: "RightA" });
+    const leftA: EitherA = E.left("LeftA");
+
+    const rightB: EitherB = E.right("RightB");
+    const leftB: EitherB = E.left("LeftB");
+
+    {
+      const result = F.pipe(rightA, E.apS("rightB", rightB));
+      const expect = E.of({ rightA: "RightA", rightB: "RightB" });
+      assert.deepStrictEqual(result, expect);
+    }
+
+    {
+      const result = F.pipe(leftA, E.apS("rightB", rightB));
+      const expect = E.left("LeftA");
+      assert.deepStrictEqual(result, expect);
+    }
+
+    {
+      const result = F.pipe(rightA, E.apS("rightB", leftB));
+      const expect = E.left("LeftB");
+      assert.deepStrictEqual(result, expect);
+    }
+
+    {
+      const result = F.pipe(leftA, E.apS("rightB", leftB));
+      const expect = E.left("LeftA");
+      assert.deepStrictEqual(result, expect);
+    }
+  }
+
+  {
+    type LeftAll = "Left0" | "Left1" | "Left2";
+
+    type Either0 = E.Either<LeftAll, "Right0">;
+    const right0: Either0 = E.right("Right0");
+    const left0: Either0 = E.left("Left0");
+
+    type Either1 = E.Either<LeftAll, "Right1">;
+    const right1: Either1 = E.right("Right1");
+    const left1: Either1 = E.left("Left1");
+
+    type Either2 = E.Either<LeftAll, "Right2">;
+    const right2: Either2 = E.right("Right2");
+    const left2: Either2 = E.left("Left2");
+
+    {
+      const result = F.pipe(
+        E.of({}),
+        E.apS("result0", right0),
+        E.apS("result1", right1),
+        E.apS("result2", right2),
+      );
+
+      const expect = E.right({
+        result0: "Right0",
+        result1: "Right1",
+        result2: "Right2",
+      });
+
+      assert.deepStrictEqual(result, expect);
+    }
+
+    {
+      const result = F.pipe(
+        E.of({}),
+        E.apS("result0", left0),
+        E.apS("result1", left1),
+        E.apS("result2", right2),
+      );
+
+      const expect = E.left("Left0"); // takes the first left
+
+      assert.deepStrictEqual(result, expect);
+    }
+  }
+}
