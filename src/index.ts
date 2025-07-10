@@ -12,3 +12,9 @@ import * as E from "fp-ts/Either";
     },
   );
 }
+
+{
+  const left = E.left("Left");
+  const right = E.right(42);
+  const ofRight = E.of(42);
+}
