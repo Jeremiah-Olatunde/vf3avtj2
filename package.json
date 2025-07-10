@@ -1,0 +1,16 @@
+{
+  "name": "d22d25ba-cdea-41d9-9759-1c62151c722b",
+  "version": "0.0.0",
+  "description": "exploring fp-ts either",
+  "keywords": [
+    "fp-ts",
+    "either"
+  ],
+  "license": "ISC",
+  "author": "Jesuseun Jeremiah Olatunde",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
