@@ -225,3 +225,11 @@ import * as number from "fp-ts/number";
     }
   }
 }
+
+{
+  // TODO: Semigroup.first Semigroup.last
+}
+
+{
+  // TODO: Semigroup.concatAll Semigroup.intercalate
+}
