@@ -321,7 +321,7 @@ import * as A from "fp-ts/ReadonlyArray";
 
 {
   // Either.bindTo
-  //
+
   const first = "Jesuseun" as const;
   const middle = "Jeremiah" as const;
   const last = "Olatunde" as const;
@@ -331,6 +331,25 @@ import * as A from "fp-ts/ReadonlyArray";
     E.bindTo("first"),
     E.bind("middle", () => E.right(middle)),
     E.bind("last", () => E.right(last)),
+  );
+
+  const expect = E.right({ first, middle, last });
+
+  assert.deepStrictEqual(actual, expect);
+}
+
+{
+  // Either.bindTo
+
+  const first = "Jesuseun" as const;
+  const middle = "Jeremiah" as const;
+  const last = "Olatunde" as const;
+
+  const actual = F.pipe(
+    E.Do,
+    E.let("first", F.constant(first)),
+    E.let("middle", F.constant(middle)),
+    E.let("last", F.constant(last)),
   );
 
   const expect = E.right({ first, middle, last });
