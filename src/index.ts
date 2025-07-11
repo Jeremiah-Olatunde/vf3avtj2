@@ -127,11 +127,11 @@ import * as A from "fp-ts/ReadonlyArray";
 
     type Either2 = E.Either<LeftAll, "Right2">;
     const right2: Either2 = E.right("Right2");
-    const left2: Either2 = E.left("Left2");
+    // const left2: Either2 = E.left("Left2");
 
     {
       const result = F.pipe(
-        E.of({}),
+        E.Do,
         E.apS("result0", right0),
         E.apS("result1", right1),
         E.apS("result2", right2),
@@ -159,4 +159,33 @@ import * as A from "fp-ts/ReadonlyArray";
       assert.deepStrictEqual(result, expect);
     }
   }
+}
+
+{
+  // either.apSW
+  type EitherNameFirst = E.Either<"ErrorNameFirst", string>;
+  const eitherNameFirst: EitherNameFirst = E.of("Jesuseun");
+
+  type EitherNameMiddle = E.Either<"ErrorNameMiddle", string>;
+  const eitherNameMiddle: EitherNameMiddle = E.of("Jeremiah");
+
+  type EitherNameLast = E.Either<"ErrorNameLast", string>;
+  const eitherNameLast: EitherNameLast = E.of("Olatunde");
+
+  type FullNameKeys = "first" | "middle" | "last";
+  type FullName = Record<FullNameKeys, string>;
+
+  function fullName({ first, middle, last }: FullName): string {
+    return `${first} ${middle} ${last}`;
+  }
+
+  const result = F.pipe(
+    E.Do,
+    E.apSW("first", eitherNameFirst),
+    E.apSW("middle", eitherNameMiddle),
+    E.apSW("last", eitherNameLast),
+    E.map(fullName),
+  );
+
+  assert.deepStrictEqual(result, E.of("Jesuseun Jeremiah Olatunde"));
 }
