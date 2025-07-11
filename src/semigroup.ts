@@ -74,3 +74,35 @@ import { Semigroup } from "fp-ts/Semigroup";
     assert.equal(actual, expect);
   }
 }
+
+{
+  function concat<T>(semigroup: Semigroup<T>, x: T, y: T): T {
+    return semigroup.concat(x, y);
+  }
+
+  interface Parameterized<T> {
+    Array: Semigroup<Array<T>>;
+    Record: Semigroup<Record<string, T>>;
+  }
+
+  const SemigroupsNumber: Parameterized<number> = {
+    Array: { concat: (x, y) => [...x, ...y] },
+    Record: {
+      concat: (x, y) => {
+        return { ...x, ...y };
+      },
+    },
+  };
+
+  {
+    const actual = concat(SemigroupsNumber.Array, [0], [1]);
+    const expect = [0, 1];
+    assert.deepStrictEqual(actual, expect);
+  }
+
+  {
+    const actual = concat(SemigroupsNumber.Record, { x: 0 }, { y: 1 });
+    const expect = { x: 0, y: 1 };
+    assert.deepStrictEqual(actual, expect);
+  }
+}
