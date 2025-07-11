@@ -430,3 +430,43 @@ import * as A from "fp-ts/ReadonlyArray";
 
   assert.deepStrictEqual(actual, expect);
 }
+
+{
+  /**
+   * Either.alt
+   * similar to the short-circuting version of  the || operator
+   * note the similarity to Either.tap which would be && for eithers
+   * */
+
+  type EitherA = E.Either<"LeftA", "RightA">;
+  const rightA: EitherA = E.of("RightA");
+  const leftA: EitherA = E.left("LeftA");
+
+  type EitherB = E.Either<"LeftB", "RightB">;
+  const rightB: EitherB = E.of("RightB");
+  const leftB: EitherB = E.left("LeftB");
+
+  {
+    // rightA || rightB
+    const actual = F.pipe(rightA, E.altW(F.constant(rightB)));
+    assert.deepStrictEqual(actual, rightA);
+  }
+
+  {
+    // rightA || leftB
+    const actual = F.pipe(rightA, E.altW(F.constant(leftB)));
+    assert.deepStrictEqual(actual, rightA);
+  }
+
+  {
+    // leftA || rightB
+    const actual = F.pipe(leftA, E.altW(F.constant(rightB)));
+    assert.deepStrictEqual(actual, rightB);
+  }
+
+  {
+    // leftA || leftB
+    const actual = F.pipe(leftA, E.altW(F.constant(leftB)));
+    assert.deepStrictEqual(actual, leftB);
+  }
+}
