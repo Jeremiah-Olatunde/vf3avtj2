@@ -260,6 +260,7 @@ import * as A from "fp-ts/ReadonlyArray";
 
 {
   // Either.bind, Either.bindW
+  // Admittedly a ridiculous example
 
   type EitherNameFirst = E.Either<"ErrorNameFirst", string>;
   const eitherNameFirst: EitherNameFirst = E.of("Jesuseun");
@@ -315,5 +316,24 @@ import * as A from "fp-ts/ReadonlyArray";
   );
 
   const expect = E.left("ErrorInvalidLastName");
+  assert.deepStrictEqual(actual, expect);
+}
+
+{
+  // Either.bindTo
+  //
+  const first = "Jesuseun" as const;
+  const middle = "Jeremiah" as const;
+  const last = "Olatunde" as const;
+
+  const actual = F.pipe(
+    E.right(first),
+    E.bindTo("first"),
+    E.bind("middle", () => E.right(middle)),
+    E.bind("last", () => E.right(last)),
+  );
+
+  const expect = E.right({ first, middle, last });
+
   assert.deepStrictEqual(actual, expect);
 }
