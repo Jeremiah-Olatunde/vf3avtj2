@@ -1,5 +1,6 @@
 import assert from "node:assert";
 import * as S from "fp-ts/Semigroup";
+import * as A from "fp-ts/ReadonlyArray";
 
 {
   function concat<T>(semigroup: S.Semigroup<T>, x: T, y: T): T {
@@ -105,6 +106,22 @@ import * as S from "fp-ts/Semigroup";
     const expect = { x: 0, y: 1 };
     assert.deepStrictEqual(actual, expect);
   }
+}
+
+{
+  /**
+   * Folding over a string array using Semigroup
+   * */
+
+  const SemigroupString: S.Semigroup<string> = {
+    concat: (x, y) => `${x}${y}`,
+  };
+
+  const xs: readonly string[] = "hello".split("");
+
+  const actual = A.reduce("", SemigroupString.concat)(xs);
+  const expect = "hello";
+  assert.equal(actual, expect);
 }
 
 {
