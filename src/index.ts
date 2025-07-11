@@ -257,3 +257,63 @@ import * as A from "fp-ts/ReadonlyArray";
 
   assert.deepStrictEqual(result, E.of("Jesuseun Jeremiah Olatunde"));
 }
+
+{
+  // Either.bind, Either.bindW
+
+  type EitherNameFirst = E.Either<"ErrorNameFirst", string>;
+  const eitherNameFirst: EitherNameFirst = E.of("Jesuseun");
+
+  type EitherNameMiddle = E.Either<"ErrorNameMiddle", string>;
+  const eitherNameMiddle: EitherNameMiddle = E.of("Jeremiah");
+
+  type EitherNameLast = E.Either<"ErrorNameLast", string>;
+  const eitherNameLast: EitherNameLast = E.of("Olatunde");
+
+  type FullNameKeys = "first" | "middle" | "last";
+  type FullName = Record<FullNameKeys, string>;
+
+  type NameFirst = Pick<FullName, "first">;
+  type EitherValidNameFirst = E.Either<"ErrorInvalidFirstName", NameFirst>;
+
+  function validateNameFirst({ first }: NameFirst): EitherValidNameFirst {
+    if (first.length < 5) return E.left("ErrorInvalidFirstName");
+    return E.right({ first });
+  }
+
+  type NameMiddle = Pick<FullName, "middle">;
+  type EitherValidNameMiddle = E.Either<"ErrorInvalidMiddleName", NameMiddle>;
+
+  function validateNameMiddle({ middle }: NameMiddle): EitherValidNameMiddle {
+    if (middle.length < 5) return E.left("ErrorInvalidMiddleName");
+    return E.right({ middle });
+  }
+
+  type NameLast = Pick<FullName, "last">;
+  type EitherValidNameLast = E.Either<"ErrorInvalidLastName", NameLast>;
+
+  function validateNameLast({ last }: NameLast): EitherValidNameLast {
+    if (last.length < 10) return E.left("ErrorInvalidLastName");
+    return E.right({ last });
+  }
+
+  function fullName({ first, middle, last }: FullName): string {
+    return `${first} ${middle} ${last}`;
+  }
+
+  const actual = F.pipe(
+    E.Do,
+    E.bindW("first", (_) => eitherNameFirst),
+    E.bindW("middle", (names) =>
+      E.tap(eitherNameMiddle, () => validateNameFirst(names)),
+    ),
+    E.bindW("last", (names) =>
+      E.tap(eitherNameLast, () => validateNameMiddle(names)),
+    ),
+    E.tap((names) => validateNameLast(names)),
+    E.map(fullName),
+  );
+
+  const expect = E.left("ErrorInvalidLastName");
+  assert.deepStrictEqual(actual, expect);
+}
