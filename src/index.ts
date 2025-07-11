@@ -43,9 +43,8 @@ import * as A from "fp-ts/ReadonlyArray";
     type User = { name: string; age: number };
     type EitherGetUsers = E.Either<"ErrorNetwork", readonly User[]>;
 
-    function head<T>(xs: readonly T[]): E.Either<"ErrorEmptyArray", T> {
-      return F.pipe(xs, A.head, E.fromOption(F.constant("ErrorEmptyArray")));
-    }
+    const ErrorEmptyArray = F.constant("ErrorEmptyArray" as const);
+    const head = F.flow(A.head, E.fromOption(ErrorEmptyArray));
 
     {
       const users: EitherGetUsers = E.of([]);
