@@ -230,6 +230,7 @@ import * as A from "fp-ts/ReadonlyArray";
 
 {
   // either.apSW
+  // TODO: define liftN with of apSW
   type EitherNameFirst = E.Either<"ErrorNameFirst", string>;
   const eitherNameFirst: EitherNameFirst = E.of("Jesuseun");
 
