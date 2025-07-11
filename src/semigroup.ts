@@ -1,28 +1,28 @@
 import assert from "node:assert";
-import { Semigroup } from "fp-ts/Semigroup";
+import * as S from "fp-ts/Semigroup";
 
 {
-  function concat<T>(semigroup: Semigroup<T>, x: T, y: T): T {
+  function concat<T>(semigroup: S.Semigroup<T>, x: T, y: T): T {
     return semigroup.concat(x, y);
   }
 
-  const SemigroupString: Semigroup<string> = {
+  const SemigroupString: S.Semigroup<string> = {
     concat: (x, y) => `${x}${y}`,
   };
 
-  const SemigroupNumberAdd: Semigroup<number> = {
+  const SemigroupNumberAdd: S.Semigroup<number> = {
     concat: (x, y) => x + y,
   };
 
-  const SemigroupNumberMul: Semigroup<number> = {
+  const SemigroupNumberMul: S.Semigroup<number> = {
     concat: (x, y) => x * y,
   };
 
-  const SemigroupBooleanOr: Semigroup<boolean> = {
+  const SemigroupBooleanOr: S.Semigroup<boolean> = {
     concat: (x, y) => x || y,
   };
 
-  const SemigroupBooleanAnd: Semigroup<boolean> = {
+  const SemigroupBooleanAnd: S.Semigroup<boolean> = {
     concat: (x, y) => x && y,
   };
 
@@ -76,13 +76,13 @@ import { Semigroup } from "fp-ts/Semigroup";
 }
 
 {
-  function concat<T>(semigroup: Semigroup<T>, x: T, y: T): T {
+  function concat<T>(semigroup: S.Semigroup<T>, x: T, y: T): T {
     return semigroup.concat(x, y);
   }
 
   interface Parameterized<T> {
-    Array: Semigroup<Array<T>>;
-    Record: Semigroup<Record<string, T>>;
+    Array: S.Semigroup<Array<T>>;
+    Record: S.Semigroup<Record<string, T>>;
   }
 
   const SemigroupsNumber: Parameterized<number> = {
@@ -104,5 +104,24 @@ import { Semigroup } from "fp-ts/Semigroup";
     const actual = concat(SemigroupsNumber.Record, { x: 0 }, { y: 1 });
     const expect = { x: 0, y: 1 };
     assert.deepStrictEqual(actual, expect);
+  }
+}
+
+{
+  /**
+   * Semigroup.constant
+   * */
+
+  {
+    const { concat } = S.constant(10);
+    const actual = concat(200, 100);
+    assert.deepStrictEqual(actual, 10);
+  }
+
+  {
+    type R = Record<string, string>;
+    const { concat } = S.constant<R>({ a: "A" });
+    const actual = concat({ x: "x" }, { x: "y" });
+    assert.deepStrictEqual(actual, { a: "A" });
   }
 }
