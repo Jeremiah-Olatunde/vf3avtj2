@@ -233,3 +233,32 @@ import * as number from "fp-ts/number";
 {
   // TODO: Semigroup.concatAll Semigroup.intercalate
 }
+
+{
+  /**
+   * Semigroup.struct
+   * */
+
+  const SemigroupNumberAdd: S.Semigroup<number> = {
+    concat: (x, y) => x + y,
+  };
+
+  type Point = { x: number; y: number; z: number };
+
+  const point = (x: number, y: number, z: number): Point => ({ x, y, z });
+
+  const SemigroupPointAdd = S.struct({
+    x: SemigroupNumberAdd,
+    y: SemigroupNumberAdd,
+    z: SemigroupNumberAdd,
+  });
+
+  const origin = point(0, 0, 0);
+  const a = point(1, 1, 1);
+  const b = point(2, 2, 2);
+
+  const actual = A.reduce(origin, SemigroupPointAdd.concat)([a, b]);
+  const expect = point(3, 3, 3);
+
+  assert.deepStrictEqual(actual, expect);
+}
