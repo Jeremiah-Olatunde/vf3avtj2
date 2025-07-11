@@ -1,1 +1,1 @@
-# Exploring fp-ts Either
+# Exploring fp-ts

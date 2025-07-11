@@ -1,10 +1,10 @@
 {
   "name": "d22d25ba-cdea-41d9-9759-1c62151c722b",
   "version": "0.0.0",
-  "description": "exploring fp-ts either",
+  "description": "exploring fp-ts",
   "keywords": [
     "fp-ts",
-    "either"
+    "functional programming"
   ],
   "license": "ISC",
   "author": "Jesuseun Jeremiah Olatunde",
