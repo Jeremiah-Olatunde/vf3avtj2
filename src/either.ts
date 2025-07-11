@@ -51,6 +51,8 @@ import * as A from "fp-ts/ReadonlyArray";
 {
   /*
    * Either.tap
+   * similar to the short-circuting version of  the && operator
+   * note the similarity to Either.alt which would be || for eithers
    * */
 
   type EitherA = E.Either<"LeftA", "RightA">;
