@@ -1,6 +1,9 @@
 import assert from "node:assert";
 import * as S from "fp-ts/Semigroup";
 import * as A from "fp-ts/ReadonlyArray";
+import * as F from "fp-ts/function";
+import * as O from "fp-ts/Ord";
+import * as number from "fp-ts/number";
 
 {
   function concat<T>(semigroup: S.Semigroup<T>, x: T, y: T): T {
@@ -140,5 +143,85 @@ import * as A from "fp-ts/ReadonlyArray";
     const { concat } = S.constant<R>({ a: "A" });
     const actual = concat({ x: "x" }, { x: "y" });
     assert.deepStrictEqual(actual, { a: "A" });
+  }
+}
+
+{
+  /**
+   * Semigroup.min, Semigroup.max
+   * */
+  {
+    const { concat: max } = S.max(number.Ord);
+    const { concat: min } = S.min(number.Ord);
+    const head = 10;
+    const tail = [5, 7, 2, 4, 1];
+
+    {
+      assert.equal(max(5, 10), 10);
+      assert.equal(max(10, 5), max(5, 10));
+    }
+
+    {
+      assert.equal(min(5, 10), 5);
+      assert.equal(min(10, 5), min(5, 10));
+    }
+
+    {
+      const actual = F.pipe(tail, A.reduce(head, max));
+      const expect = 10;
+      assert.equal(actual, expect);
+    }
+
+    {
+      const actual = F.pipe(tail, A.reduce(head, min));
+      const expect = 1;
+      assert.equal(actual, expect);
+    }
+  }
+
+  {
+    type Person = {
+      name: string;
+      age: number;
+    };
+
+    const OrdPerson: O.Ord<Person> = {
+      equals: (x, y) => x.age === y.age,
+      compare: (x, y) => {
+        if (OrdPerson.equals(x, y)) return 0;
+        return x.age < y.age ? -1 : 1;
+      },
+    };
+
+    const SemigroupPersonMax: S.Semigroup<Person> = S.max(OrdPerson);
+    const SemigroupPersonMin: S.Semigroup<Person> = S.min(OrdPerson);
+
+    const jeremiah: Person = {
+      name: "Jeremiah",
+      age: 23,
+    };
+
+    const nehemiah: Person = {
+      name: "Nehemiah",
+      age: 18,
+    };
+
+    const roman: Person = {
+      name: "Roman",
+      age: 22,
+    };
+
+    const head: Person = nehemiah;
+    const tail: readonly Person[] = [jeremiah, roman];
+
+    {
+      const actual = F.pipe(tail, A.reduce(head, SemigroupPersonMax.concat));
+      assert.deepStrictEqual(actual, jeremiah);
+    }
+
+    {
+      const actual = F.pipe(tail, A.reduce(head, SemigroupPersonMin.concat));
+      assert.deepStrictEqual(actual, nehemiah);
+    }
   }
 }
