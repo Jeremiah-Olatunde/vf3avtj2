@@ -4,16 +4,72 @@ import * as F from "fp-ts/function";
 import * as A from "fp-ts/ReadonlyArray";
 
 {
-  // tap
-  const eitherA: E.Either<"LeftA", "RightA"> = E.left("LeftA");
-  const eitherB: E.Either<"LeftB", "RightB"> = E.left("LeftB");
+  type EitherA = E.Either<"LeftA", "RightA">;
+  const rightA: EitherA = E.of("RightA");
+  const leftA: EitherA = E.left("LeftA");
 
-  const inspect: E.Either<"LeftA" | "LeftB", "RightA"> = E.tap(
-    eitherA,
-    (a: "RightA") => {
-      return eitherB;
-    },
-  );
+  type EitherB = E.Either<"LeftB", "RightB">;
+  const rightB: EitherB = E.of("RightB");
+  const leftB: EitherB = E.left("LeftB");
+
+  {
+    const actual = F.pipe(
+      rightA,
+      E.tap(() => rightB),
+    );
+    const expect = E.of("RightA");
+    assert.deepStrictEqual(actual, expect);
+  }
+
+  {
+    const actual = F.pipe(
+      leftA,
+      E.tap(() => rightB),
+    );
+    const expect = E.left("LeftA");
+    assert.deepStrictEqual(actual, expect);
+  }
+
+  {
+    const actual = F.pipe(
+      rightA,
+      E.tap(() => leftB),
+    );
+    const expect = E.left("LeftB");
+    assert.deepStrictEqual(actual, expect);
+  }
+
+  {
+    type User = { name: string; age: number };
+    type EitherGetUsers = E.Either<"ErrorNetwork", readonly User[]>;
+
+    function head<T>(xs: readonly T[]): E.Either<"ErrorEmptyArray", T> {
+      return F.pipe(xs, A.head, E.fromOption(F.constant("ErrorEmptyArray")));
+    }
+
+    {
+      const users: EitherGetUsers = E.of([]);
+      const actual = F.pipe(users, E.tap(head));
+      const expect = E.left("ErrorEmptyArray");
+      assert.deepStrictEqual(actual, expect);
+    }
+
+    {
+      const users: EitherGetUsers = E.left("ErrorNetwork");
+      const actual = F.pipe(users, E.tap(head));
+      const expect = E.left("ErrorNetwork");
+      assert.deepStrictEqual(actual, expect);
+    }
+
+    {
+      const jeremiah = { name: "Jeremiah", age: 23 };
+      const nehemiah = { name: "nehemiah", age: 18 };
+      const users: EitherGetUsers = E.right([jeremiah, nehemiah]);
+      const actual = F.pipe(users, E.tap(head));
+      const expect = E.right([jeremiah, nehemiah]);
+      assert.deepStrictEqual(actual, expect);
+    }
+  }
 }
 
 {
