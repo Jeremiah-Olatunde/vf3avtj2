@@ -17,9 +17,21 @@ import * as A from "fp-ts/ReadonlyArray";
 }
 
 {
-  const left = E.left("Left");
-  const right = E.right(42);
-  const ofRight = E.of(42);
+  // Either.of, Either.right, Either.left
+  {
+    const result = E.of("goodbye Earth");
+    assert(result._tag === "Right");
+  }
+
+  {
+    const result = E.right("hello Mars");
+    assert(result._tag === "Right");
+  }
+
+  {
+    const result = E.left("crashed into the moon");
+    assert(result._tag === "Left");
+  }
 }
 
 {
