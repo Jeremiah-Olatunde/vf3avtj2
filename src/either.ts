@@ -1,14 +1,15 @@
 import assert from "node:assert";
 import * as E from "fp-ts/Either";
-import * as F from "fp-ts/function";
+import * as FunctionCore from "fp-ts/function";
+import * as FunctionStd from "fp-ts-std/Function";
 import * as A from "fp-ts/ReadonlyArray";
+import * as Apply from "fp-ts/Apply";
 
 import * as StringStd from "fp-ts-std/String";
 import * as StringCore from "fp-ts/string";
 
-import * as Sg from "fp-ts/Semigroup";
-
 const S = { ...StringCore, ...StringStd };
+const F = { ...FunctionCore, ...FunctionStd };
 
 {
   /*
@@ -534,10 +535,10 @@ const S = { ...StringCore, ...StringStd };
    * Either.getApplicativeValidation
    * */
 
-  const semigroup = A.getSemigroup<string>();
-  const Applicative = E.getApplicativeValidation(semigroup);
-
   {
+    const semigroup = A.getSemigroup<string>();
+    const Applicative = E.getApplicativeValidation(semigroup);
+
     type EitherA = E.Either<readonly string[], string>;
     type EitherB = E.Either<readonly string[], (x: string) => number>;
 
@@ -563,6 +564,101 @@ const S = { ...StringCore, ...StringStd };
       const actual = Applicative.ap(eitherAtoB, eitherA);
       const expect = E.left(["ErrorAtoB", "ErrorA"]);
       assert.deepStrictEqual(actual, expect);
+    }
+
+    {
+      const eitherA: EitherA = E.left(["ErrorA"]);
+      const eitherAtoB: EitherB = E.left(["ErrorAtoB"]);
+      const actual = Applicative.ap(eitherAtoB, eitherA);
+      const expect = E.left(["ErrorAtoB", "ErrorA"]);
+      assert.deepStrictEqual(actual, expect);
+    }
+  }
+
+  {
+    const semigroup = A.getSemigroup<string>();
+    const Applicative = E.getApplicativeValidation(semigroup);
+
+    type Name = Readonly<Record<"first" | "middle" | "last", string>>;
+
+    function name(first: string, middle: string, last: string): Name {
+      return { first, middle, last };
+    }
+
+    const nameC = F.curry3(name);
+
+    type EitherFirst = E.Either<["InvalidFirst"], string>;
+    type EitherMiddle = E.Either<["InvalidMiddle"], string>;
+    type EitherLast = E.Either<["InvalidLast"], string>;
+
+    {
+      const { ap } = Applicative;
+
+      const first: EitherFirst = E.right("Jesuseun");
+      const middle: EitherMiddle = E.right("Jeremiah");
+      const last: EitherLast = E.right("Olatunde");
+
+      // const actual = ap(ap(E.map(nameC)(first), middle), last);
+      const actual = ap(ap(ap(E.of(nameC), first), middle), last);
+
+      const expect = E.right({
+        first: "Jesuseun",
+        middle: "Jeremiah",
+        last: "Olatunde",
+      });
+      assert.deepStrictEqual(actual, expect);
+    }
+
+    {
+      const { ap } = Applicative;
+
+      const first: EitherFirst = E.right("Jesuseun");
+      const middle: EitherMiddle = E.left(["InvalidMiddle"]);
+      const last: EitherLast = E.left(["InvalidLast"]);
+
+      const actual = ap(ap(ap(E.of(nameC), first), middle), last);
+      const expect = E.left(["InvalidMiddle", "InvalidLast"]);
+      assert.deepStrictEqual(actual, expect);
+    }
+
+    {
+      const first: EitherFirst = E.right("Jesuseun");
+      const middle: EitherMiddle = E.left(["InvalidMiddle"]);
+      const last: EitherLast = E.left(["InvalidLast"]);
+
+      {
+        // Recall that the default apS using the default Either Applicative
+        // instance short circuit on the first Left value
+
+        const actual = F.pipe(
+          E.Do,
+          E.apSW("first", first),
+          E.apSW("middle", middle),
+          E.apSW("last", last),
+        );
+
+        const expect = E.left(["InvalidMiddle"]);
+        assert.deepStrictEqual(actual, expect);
+      }
+
+      {
+        // Using the applicative instance from getApplicativeValidation
+
+        const apS = Apply.apS(Applicative);
+
+        const see = Apply.sequenceT(Applicative)(first, middle, last);
+        const inspect = E.map(F.tupled(name))(see);
+
+        const actual = F.pipe(
+          E.Do,
+          apS("first", first),
+          apS("middle", middle),
+          apS("last", last),
+        );
+
+        const expect = E.left(["InvalidMiddle", "InvalidLast"]);
+        assert.deepStrictEqual(actual, expect);
+      }
     }
   }
 }
