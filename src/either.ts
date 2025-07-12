@@ -528,3 +528,41 @@ const S = { ...StringCore, ...StringStd };
     assert.deepStrictEqual(actual, expect);
   }
 }
+
+{
+  /**
+   * Either.getApplicativeValidation
+   * */
+
+  const semigroup = A.getSemigroup<string>();
+  const Applicative = E.getApplicativeValidation(semigroup);
+
+  {
+    type EitherA = E.Either<readonly string[], string>;
+    type EitherB = E.Either<readonly string[], (x: string) => number>;
+
+    {
+      const eitherA: EitherA = E.left(["ErrorA"]);
+      const eitherAtoB: EitherB = E.right((x: string) => x.length);
+      const actual = Applicative.ap(eitherAtoB, eitherA);
+      const expect = E.left(["ErrorA"]);
+      assert.deepStrictEqual(actual, expect);
+    }
+
+    {
+      const eitherA: EitherA = E.right("hello world");
+      const eitherAtoB: EitherB = E.right((x: string) => x.length);
+      const actual = Applicative.ap(eitherAtoB, eitherA);
+      const expect = E.right(11);
+      assert.deepStrictEqual(actual, expect);
+    }
+
+    {
+      const eitherA: EitherA = E.left(["ErrorA"]);
+      const eitherAtoB: EitherB = E.left(["ErrorAtoB"]);
+      const actual = Applicative.ap(eitherAtoB, eitherA);
+      const expect = E.left(["ErrorAtoB", "ErrorA"]);
+      assert.deepStrictEqual(actual, expect);
+    }
+  }
+}
