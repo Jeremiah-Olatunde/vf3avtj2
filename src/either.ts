@@ -3,6 +3,13 @@ import * as E from "fp-ts/Either";
 import * as F from "fp-ts/function";
 import * as A from "fp-ts/ReadonlyArray";
 
+import * as StringStd from "fp-ts-std/String";
+import * as StringCore from "fp-ts/string";
+
+import * as Sg from "fp-ts/Semigroup";
+
+const S = { ...StringCore, ...StringStd };
+
 {
   /*
    * Reimplementing the example from the official docs
@@ -433,7 +440,7 @@ import * as A from "fp-ts/ReadonlyArray";
 
 {
   /**
-   * Either.alt
+   * Either.alt, Either.altW
    * similar to the short-circuting version of  the || operator
    * note the similarity to Either.tap which would be && for eithers
    * */
@@ -468,5 +475,56 @@ import * as A from "fp-ts/ReadonlyArray";
     // leftA || leftB
     const actual = F.pipe(leftA, E.altW(F.constant(leftB)));
     assert.deepStrictEqual(actual, leftB);
+  }
+}
+
+{
+  function validateNG(
+    telephone: string,
+  ): E.Either<readonly ["InvalidNG"], string> {
+    const regex = /^\+234[789][01]\d{8}$/;
+    const error = F.constant(["InvalidNG"] as const);
+    return E.fromPredicate(S.test(regex), error)(telephone);
+  }
+
+  function validateCM(
+    telephone: string,
+  ): E.Either<readonly ["InvalidCM"], string> {
+    const regex = /^\+237[2368]\d{8}$/;
+    const error = F.constant(["InvalidCM"] as const);
+    return E.fromPredicate(S.test(regex), error)(telephone);
+  }
+
+  function validateUS(
+    telephone: string,
+  ): E.Either<readonly ["InvalidUS"], string> {
+    const regex = /^\+1[2-9]\d{2}[2-9]\d{6}$/;
+    const error = F.constant(["InvalidUS"] as const);
+    return E.fromPredicate(S.test(regex), error)(telephone);
+  }
+
+  const semigroup = A.getSemigroup<string>();
+  const { alt } = E.getAltValidation(semigroup);
+
+  {
+    const telephone = "+447912345678";
+    const actual = alt(
+      alt(validateNG(telephone), F.constant(validateUS(telephone))),
+      F.constant(validateCM(telephone)),
+    );
+    const expect = E.left(["InvalidNG", "InvalidUS", "InvalidCM"]);
+
+    assert.deepStrictEqual(actual, expect);
+  }
+
+  {
+    const telephone = "+2348178917635";
+    const actual = alt(
+      alt(validateNG(telephone), F.constant(validateUS(telephone))),
+      F.constant(validateCM(telephone)),
+    );
+    const expect = E.right(telephone);
+
+    assert.deepStrictEqual(actual, expect);
   }
 }
