@@ -1,15 +1,19 @@
 import assert from "node:assert";
 import * as E from "fp-ts/Either";
+import * as R from "fp-ts/Refinement";
 import * as FunctionCore from "fp-ts/function";
 import * as FunctionStd from "fp-ts-std/Function";
-import * as A from "fp-ts/ReadonlyArray";
+import * as ArrayCore from "fp-ts/ReadonlyArray";
+import * as ArrayStd from "fp-ts-std/ReadonlyArray";
 import * as Apply from "fp-ts/Apply";
+import * as N from "fp-ts/number";
 
 import * as StringStd from "fp-ts-std/String";
 import * as StringCore from "fp-ts/string";
 
 const S = { ...StringCore, ...StringStd };
 const F = { ...FunctionCore, ...FunctionStd };
+const A = { ...ArrayCore, ...ArrayStd };
 
 {
   /*
@@ -927,4 +931,50 @@ const F = { ...FunctionCore, ...FunctionStd };
 
   assert.deepStrictEqual(safeHead([]), E.left("ErrorEmptyArray"));
   assert.deepStrictEqual(safeHead([10]), E.right(10));
+}
+
+{
+  /**
+   * Either.fromPredicate
+   * */
+
+  type Odd = 1 | 3 | 5 | 7 | 9;
+  type Even = 0 | 2 | 4 | 6 | 8;
+  type Num = Odd | Even;
+
+  type RefineOdd = R.Refinement<number, Odd>;
+  type RefineEven = R.Refinement<number, Even>;
+  type RefineNum = R.Refinement<number, Num>;
+
+  const EVEN = [2, 4, 6, 8] as const;
+  const ODD = [1, 3, 5, 7, 9] as const;
+
+  const isOdd = A.elemV(N.Eq)(ODD) as RefineOdd;
+  const isEven = A.elemV(N.Eq)(EVEN) as RefineEven;
+  const isNum = R.or(isOdd)(isEven) as RefineNum;
+
+  const whenNotEven = F.constant("NotEven" as const);
+  const whenNotOdd = F.constant("NotOdd" as const);
+  const whenNotNum = F.constant("NotNum" as const);
+
+  const liftEven = E.fromPredicate(isEven, whenNotEven);
+  const liftOdd = E.fromPredicate(isOdd, whenNotOdd);
+  const liftNum = E.fromPredicate(isNum, whenNotNum);
+
+  assert.deepStrictEqual(liftEven(3), E.left("NotEven"));
+  assert.deepStrictEqual(liftEven(5), E.left("NotEven"));
+  assert.deepStrictEqual(liftEven(2), E.right(2));
+  assert.deepStrictEqual(liftEven(4), E.right(4));
+
+  assert.deepStrictEqual(liftOdd(6), E.left("NotOdd"));
+  assert.deepStrictEqual(liftOdd(8), E.left("NotOdd"));
+  assert.deepStrictEqual(liftOdd(3), E.right(3));
+  assert.deepStrictEqual(liftOdd(9), E.right(9));
+
+  assert.deepStrictEqual(liftNum(10), E.left("NotNum"));
+  assert.deepStrictEqual(liftNum(50), E.left("NotNum"));
+  assert.deepStrictEqual(liftNum(3), E.right(3));
+  assert.deepStrictEqual(liftNum(9), E.right(9));
+  assert.deepStrictEqual(liftNum(2), E.right(2));
+  assert.deepStrictEqual(liftNum(4), E.right(4));
 }
