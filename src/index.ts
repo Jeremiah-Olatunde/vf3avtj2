@@ -1,3 +1,3 @@
 import "./either.js";
-
-console.log("hello fp-ts");
+import "./semigroup.js";
+import "./readonly-array.js";
