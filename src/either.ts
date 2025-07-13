@@ -743,3 +743,24 @@ const F = { ...FunctionCore, ...FunctionStd };
     assert.deepStrictEqual(actual, uiNotFound);
   }
 }
+
+{
+  /**
+   * Either.filterOrElse
+   * */
+
+  type DivResult = E.Either<"DivisionByZero", number>;
+  function safeDivide(dividend: number, divisor: number): DivResult {
+    return F.pipe(
+      E.of(divisor),
+      E.filterOrElse(
+        (x) => x !== 0,
+        (_) => "DivisionByZero" as const,
+      ),
+      E.map((x) => dividend / x),
+    );
+  }
+
+  assert.deepStrictEqual(safeDivide(10, 0), E.left("DivisionByZero"));
+  assert.deepStrictEqual(safeDivide(10, 2), E.right(5));
+}
