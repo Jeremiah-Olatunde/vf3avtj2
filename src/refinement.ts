@@ -138,3 +138,14 @@ const isNum: RefineNum = (x): x is Num => [2, 3, 4, 5, 6, 7, 9].includes(x);
   assert.strictEqual(refine("500"), isErrorServer("500"));
   assert.strictEqual(refine("400"), isErrorServer("400"));
 }
+
+{
+  /**
+   * Refinement.zero
+   * */
+
+  const refine = R.zero<number, Num>();
+  assert.strictEqual(refine(1000), false);
+  assert.strictEqual(refine(2), false);
+  assert.strictEqual(refine(9), false);
+}
