@@ -32,3 +32,15 @@ import * as F from "fp-ts/function";
     assert.deepStrictEqual(actual, expect);
   }
 }
+
+{
+  /**
+   * ReadonlyArray.replicate
+   * */
+
+  {
+    const actual = RA.replicate(10, 0);
+    const expect = RA.makeBy(10, F.constant(0));
+    assert.deepStrictEqual(actual, expect);
+  }
+}
