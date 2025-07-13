@@ -20,3 +20,15 @@ import * as F from "fp-ts/function";
     assert.deepStrictEqual(actual, expect);
   }
 }
+
+{
+  /**
+   * ReadonlyArray.of
+   * */
+
+  {
+    const actual = RA.of(10);
+    const expect = [10];
+    assert.deepStrictEqual(actual, expect);
+  }
+}
