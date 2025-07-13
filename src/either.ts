@@ -1111,3 +1111,28 @@ const A = { ...ArrayCore, ...ArrayStd };
     assert.deepStrictEqual(actual, expect);
   }
 }
+
+{
+  // Either.map
+
+  {
+    const actual = F.pipe(E.left("Left"), E.map(F.decrement));
+    const expect = E.left("Left");
+    assert.deepStrictEqual(actual, expect);
+  }
+
+  {
+    const actual = F.pipe(E.of(42), E.map(F.decrement));
+    const expect = E.of(41);
+    assert.deepStrictEqual(actual, expect);
+  }
+
+  {
+    const actual = F.pipe(
+      E.of(42),
+      E.map((_) => `${_}`),
+    );
+    const expect = E.of("42");
+    assert.deepStrictEqual(actual, expect);
+  }
+}
