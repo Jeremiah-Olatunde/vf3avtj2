@@ -2,6 +2,7 @@ import assert from "node:assert";
 
 import * as RA from "fp-ts/ReadonlyArray";
 import * as F from "fp-ts/function";
+import * as E from "fp-ts/Either";
 
 {
   /**
@@ -54,5 +55,17 @@ import * as F from "fp-ts/function";
     const mutable: number[] = [0, 1, 2];
     const immutable: readonly number[] = RA.fromArray(mutable);
     assert.deepStrictEqual(immutable, mutable);
+  }
+}
+
+{
+  /**
+   * ReadonlyArray.fromEither
+   * */
+
+  {
+    const actual = RA.fromEither(E.of(42));
+    const expect = RA.of(42);
+    assert.deepStrictEqual(actual, expect);
   }
 }
