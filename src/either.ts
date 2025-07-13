@@ -646,8 +646,8 @@ const F = { ...FunctionCore, ...FunctionStd };
 
         const apS = Apply.apS(Applicative);
 
-        const see = Apply.sequenceT(Applicative)(first, middle, last);
-        const inspect = E.map(F.tupled(name))(see);
+        // const see = Apply.sequenceT(Applicative)(first, middle, last);
+        // const inspect = E.map(F.tupled(name))(see);
 
         const actual = F.pipe(
           E.Do,

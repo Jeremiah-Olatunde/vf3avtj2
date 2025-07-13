@@ -57,12 +57,12 @@ type Num = Odd | Even | Prime;
 type RefineOdd = R.Refinement<Num, Odd>;
 type RefineEven = R.Refinement<Num, Even>;
 type RefinePrime = R.Refinement<Num, Prime>;
-type RefineNum = R.Refinement<number, Num>;
+// type RefineNum = R.Refinement<number, Num>;
 
 const isEven: RefineEven = (x): x is Even => x % 2 === 0;
 const isOdd: RefineOdd = (x): x is Odd => x % 2 !== 0;
 const isPrime: RefinePrime = (x): x is Prime => [2, 5, 7].includes(x);
-const isNum: RefineNum = (x): x is Num => [2, 3, 4, 5, 6, 7, 9].includes(x);
+// const isNum: RefineNum = (x): x is Num => [2, 3, 4, 5, 6, 7, 9].includes(x);
 
 {
   /**
