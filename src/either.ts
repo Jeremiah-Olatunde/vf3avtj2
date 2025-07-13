@@ -1014,7 +1014,7 @@ const A = { ...ArrayCore, ...ArrayStd };
 
 {
   /**
-   * E.liftOption
+   * e.liftoption
    * */
 
   {
@@ -1030,5 +1030,21 @@ const A = { ...ArrayCore, ...ArrayStd };
     const eitherHead = E.liftOption(A.head, F.constant("Empty" as const));
     assert.deepStrictEqual(eitherHead([2]), E.of(2));
     assert.deepStrictEqual(eitherHead([]), E.left("Empty"));
+  }
+}
+
+{
+  // Either.as
+
+  {
+    const actual = F.pipe(E.left("Error"), E.as(42));
+    const expect = E.left("Error");
+    assert.deepStrictEqual(actual, expect);
+  }
+
+  {
+    const actual = F.pipe(E.right("overwritten"), E.as(42));
+    const expect = E.right(42);
+    assert.deepStrictEqual(actual, expect);
   }
 }
