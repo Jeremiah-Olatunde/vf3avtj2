@@ -1095,3 +1095,19 @@ const A = { ...ArrayCore, ...ArrayStd };
     assert.deepStrictEqual(actual, expect);
   }
 }
+
+{
+  // Either.flap
+
+  {
+    const actual = F.pipe(E.of(F.increment), E.flap(42));
+    const expect = E.of(43);
+    assert.deepStrictEqual(actual, expect);
+  }
+
+  {
+    const actual = F.pipe(E.left("Error"), E.flap(42));
+    const expect = E.left("Error");
+    assert.deepStrictEqual(actual, expect);
+  }
+}
