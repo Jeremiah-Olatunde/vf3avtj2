@@ -764,3 +764,47 @@ const F = { ...FunctionCore, ...FunctionStd };
   assert.deepStrictEqual(safeDivide(10, 0), E.left("DivisionByZero"));
   assert.deepStrictEqual(safeDivide(10, 2), E.right(5));
 }
+
+{
+  /**
+   * Either.filterOrElseW
+   * */
+
+  type Bounds = [min: number, max: number];
+  type ResultBound = E.Either<"OutOfBounds", number>;
+  function bound(bounds: Bounds, x: number): ResultBound {
+    if (bounds[1] < x || x < bounds[0]) {
+      return E.left("OutOfBounds");
+    }
+
+    return E.of(x);
+  }
+
+  function boundedDiv(bounds: Bounds, dividend: number, divisor: number) {
+    return F.pipe(
+      bound(bounds, divisor),
+      E.filterOrElseW(
+        (x) => x !== 0,
+        (_) => "DivisionByZero" as const,
+      ),
+      E.map((x) => dividend / x),
+    );
+  }
+
+  {
+    const actual = boundedDiv([-10, 10], 10, 0);
+    const expect = E.left("DivisionByZero");
+    assert.deepStrictEqual(actual, expect);
+  }
+
+  {
+    const actual = boundedDiv([-10, 10], 10, 20);
+    const expect = E.left("OutOfBounds");
+    assert.deepStrictEqual(actual, expect);
+  }
+  {
+    const actual = boundedDiv([-10, 10], 10, 5);
+    const expect = E.right(2);
+    assert.deepStrictEqual(actual, expect);
+  }
+}
