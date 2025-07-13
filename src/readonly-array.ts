@@ -13,4 +13,10 @@ import * as F from "fp-ts/function";
     const expect = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
     assert.deepStrictEqual(actual, expect);
   }
+
+  {
+    const actual = RA.makeBy(10, F.increment);
+    const expect = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    assert.deepStrictEqual(actual, expect);
+  }
 }
