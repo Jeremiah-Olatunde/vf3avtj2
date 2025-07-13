@@ -62,14 +62,32 @@ const isPrime: RefinePrime = (x): x is Prime => [2, 5, 7].includes(x);
    * Refinement.or
    * */
 
-  const isError = R.or(isErrorServer)(isErrorClient);
-  assert.strictEqual(isError("400"), true);
-  assert.strictEqual(isError("404"), true);
-  assert.strictEqual(isError("500"), true);
-  assert.strictEqual(isError("501"), true);
-  assert.strictEqual(isError("100"), false);
-  assert.strictEqual(isError("300"), false);
-  assert.strictEqual(isError("202"), false);
+  {
+    const isError = R.or(isErrorServer)(isErrorClient);
+    assert.strictEqual(isError("400"), true);
+    assert.strictEqual(isError("404"), true);
+    assert.strictEqual(isError("500"), true);
+    assert.strictEqual(isError("501"), true);
+    assert.strictEqual(isError("100"), false);
+    assert.strictEqual(isError("300"), false);
+    assert.strictEqual(isError("202"), false);
+  }
+
+  {
+    const isEvenOrPrime = R.or(isEven)(isPrime);
+    assert.strictEqual(isEvenOrPrime(2), true);
+    assert.strictEqual(isEvenOrPrime(7), true);
+    assert.strictEqual(isEvenOrPrime(4), true);
+    assert.strictEqual(isEvenOrPrime(9), false);
+  }
+
+  {
+    const isOddOrPrime = R.or(isOdd)(isPrime);
+    assert.strictEqual(isOddOrPrime(3), true);
+    assert.strictEqual(isOddOrPrime(7), true);
+    assert.strictEqual(isOddOrPrime(9), true);
+    assert.strictEqual(isOddOrPrime(4), false);
+  }
 }
 
 {
