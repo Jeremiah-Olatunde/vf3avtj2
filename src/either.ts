@@ -826,9 +826,32 @@ const F = { ...FunctionCore, ...FunctionStd };
       const either = E.of(42);
       assert.deepStrictEqual(toArray(either), A.fromEither(either));
     }
+
     {
       const either = E.left("SomeError");
       assert.deepStrictEqual(toArray(either), A.fromEither(either));
     }
+  }
+}
+
+{
+  /**
+   * Either.reduce
+   * */
+
+  {
+    const add = (x: number, y: number) => x + y;
+    const actual = F.pipe(E.of(10), E.reduce(10, add));
+    assert.deepStrictEqual(actual, 20);
+  }
+
+  {
+    const prefix = "user:";
+    const either = E.of("jeremiah");
+    const actual = F.pipe(
+      either,
+      E.reduce(prefix, (x, y) => `${x}${y}`),
+    );
+    assert.deepStrictEqual(actual, "user:jeremiah");
   }
 }
