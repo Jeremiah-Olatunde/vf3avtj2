@@ -662,3 +662,29 @@ const F = { ...FunctionCore, ...FunctionStd };
     }
   }
 }
+
+{
+  /**
+   * Either.getOrElse
+   * */
+
+  {
+    const meaningOfLife: E.Either<"404", string> = E.of("You");
+    const actual = F.pipe(
+      meaningOfLife,
+      E.getOrElse((_) => "NotFound"),
+    );
+    const expect = "You";
+    assert.deepStrictEqual(actual, expect);
+  }
+
+  {
+    const meaningOfLife: E.Either<"404", string> = E.left("404");
+    const actual = F.pipe(
+      meaningOfLife,
+      E.getOrElse((_) => "NotFound"),
+    );
+    const expect = "NotFound";
+    assert.deepStrictEqual(actual, expect);
+  }
+}
