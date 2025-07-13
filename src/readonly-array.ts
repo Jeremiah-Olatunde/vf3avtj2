@@ -44,3 +44,15 @@ import * as F from "fp-ts/function";
     assert.deepStrictEqual(actual, expect);
   }
 }
+
+{
+  /**
+   * ReadonlyArray.fromArray
+   * */
+
+  {
+    const mutable: number[] = [0, 1, 2];
+    const immutable: readonly number[] = RA.fromArray(mutable);
+    assert.deepStrictEqual(immutable, mutable);
+  }
+}
