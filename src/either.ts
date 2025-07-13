@@ -978,3 +978,35 @@ const A = { ...ArrayCore, ...ArrayStd };
   assert.deepStrictEqual(liftNum(2), E.right(2));
   assert.deepStrictEqual(liftNum(4), E.right(4));
 }
+
+{
+  /**
+   * E.liftNullable
+   * */
+
+  function getEmail(username: string): string | undefined {
+    const db: Map<string, string> = new Map([
+      ["jeremiah", "jerryolatunde@gmail.com"],
+      ["roman", "romanunouse@gmail.com"],
+    ]);
+
+    return db.get(username);
+  }
+
+  type ErrorNotFound = `ErrorNotFound:${string}`;
+  const whenNullable = (n: string): ErrorNotFound => `ErrorNotFound:${n}`;
+
+  const safeGetEmail = E.liftNullable(getEmail, whenNullable);
+
+  {
+    const actual = safeGetEmail("jeremiah");
+    const expect = E.of("jerryolatunde@gmail.com");
+    assert.deepStrictEqual(actual, expect);
+  }
+
+  {
+    const actual = safeGetEmail("nehemiah");
+    const expect = E.left("ErrorNotFound:nehemiah");
+    assert.deepStrictEqual(actual, expect);
+  }
+}
