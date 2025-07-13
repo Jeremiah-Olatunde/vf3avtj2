@@ -45,6 +45,18 @@ assert.strictEqual(isErrorClient("100"), false);
 assert.strictEqual(isSuccess("100"), false);
 assert.strictEqual(isSuccess("200"), true);
 
+type Odd = 3 | 5 | 7 | 9;
+type Even = 2 | 4 | 6;
+type Prime = 2 | 5 | 7;
+
+type RefineOdd = R.Refinement<number, Odd>;
+type RefineEven = R.Refinement<number, Even>;
+type RefinePrime = R.Refinement<number, Prime>;
+
+const isEven: RefineEven = (x): x is Even => x % 2 === 0;
+const isOdd: RefineOdd = (x): x is Odd => x % 2 !== 0;
+const isPrime: RefinePrime = (x): x is Prime => [2, 5, 7].includes(x);
+
 {
   /**
    * Refinement.or
@@ -58,4 +70,26 @@ assert.strictEqual(isSuccess("200"), true);
   assert.strictEqual(isError("100"), false);
   assert.strictEqual(isError("300"), false);
   assert.strictEqual(isError("202"), false);
+}
+
+{
+  /**
+   * Refinement.and
+   * */
+
+  {
+    const isEvenAndPrime = R.and(isEven)(isPrime);
+
+    assert.strictEqual(isEvenAndPrime(2), true);
+    assert.strictEqual(isEvenAndPrime(7), false);
+    assert.strictEqual(isEvenAndPrime(4), false);
+  }
+
+  {
+    const isOddAndPrime = R.and(isOdd)(isPrime);
+
+    assert.strictEqual(isOddAndPrime(7), true);
+    assert.strictEqual(isOddAndPrime(9), false);
+    assert.strictEqual(isOddAndPrime(2), false);
+  }
 }
