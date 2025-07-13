@@ -1,7 +1,9 @@
 import assert from "node:assert";
 import * as R from "fp-ts/Refinement";
+import * as RA from "fp-ts/ReadonlyArray";
 import * as F from "fp-ts/function";
 import * as E from "fp-ts/Either";
+import * as O from "fp-ts/Option";
 
 type Success = "200" | "201";
 type ErrorServer = "500" | "501";
@@ -202,4 +204,25 @@ const isNum: RefineNum = (x): x is Num => [2, 3, 4, 5, 6, 7, 9].includes(x);
 
   assert.strictEqual(refine("hello"), false);
   assert.strictEqual(refine("hel"), true);
+}
+
+{
+  /**
+   * Refinement.fromOptionK
+   * */
+
+  type NonEmpty<T> = [T, ...T[]];
+
+  function splitHead<T>(xs: T[]): O.Option<NonEmpty<T>> {
+    return F.pipe(
+      xs,
+      RA.head,
+      O.map((head) => [head]),
+    );
+  }
+
+  const refine = R.fromOptionK(splitHead);
+
+  assert.strictEqual(refine([]), false);
+  assert.strictEqual(refine([42, 69]), true);
 }
