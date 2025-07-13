@@ -903,3 +903,28 @@ const F = { ...FunctionCore, ...FunctionStd };
   assert.deepStrictEqual(safeHead([]), E.left("ErrorEmptyArray"));
   assert.deepStrictEqual(safeHead([10]), E.right(10));
 }
+
+{
+  /**
+   * Either.tryCatchK
+   * */
+
+  class ErrorEmptyArray extends Error {}
+
+  function unsafeHead<T>(xs: T[]): T {
+    const [head] = xs; // incorrect behaviour for undefined[]
+    if (head === undefined) {
+      throw new ErrorEmptyArray("EmptyArray");
+    }
+
+    return head;
+  }
+
+  const safeHead = E.tryCatchK(
+    unsafeHead,
+    F.constant("ErrorEmptyArray" as const),
+  );
+
+  assert.deepStrictEqual(safeHead([]), E.left("ErrorEmptyArray"));
+  assert.deepStrictEqual(safeHead([10]), E.right(10));
+}
