@@ -1048,3 +1048,19 @@ const A = { ...ArrayCore, ...ArrayStd };
     assert.deepStrictEqual(actual, expect);
   }
 }
+
+{
+  // Either.asUnit
+
+  {
+    const actual = F.pipe(E.left("Error"), E.asUnit);
+    const expect = E.left("Error");
+    assert.deepStrictEqual(actual, expect);
+  }
+
+  {
+    const actual = F.pipe(E.right("overwritten"), E.asUnit);
+    const expect = E.right(undefined);
+    assert.deepStrictEqual(actual, expect);
+  }
+}
