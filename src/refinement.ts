@@ -1,5 +1,6 @@
 import assert from "node:assert";
 import * as R from "fp-ts/Refinement";
+import * as F from "fp-ts/function";
 
 type Success = "200" | "201";
 type ErrorServer = "500" | "501";
@@ -48,14 +49,17 @@ assert.strictEqual(isSuccess("200"), true);
 type Odd = 3 | 5 | 7 | 9;
 type Even = 2 | 4 | 6;
 type Prime = 2 | 5 | 7;
+type Num = Odd | Even | Prime;
 
-type RefineOdd = R.Refinement<number, Odd>;
-type RefineEven = R.Refinement<number, Even>;
-type RefinePrime = R.Refinement<number, Prime>;
+type RefineOdd = R.Refinement<Num, Odd>;
+type RefineEven = R.Refinement<Num, Even>;
+type RefinePrime = R.Refinement<Num, Prime>;
+type RefineNum = R.Refinement<number, Num>;
 
 const isEven: RefineEven = (x): x is Even => x % 2 === 0;
 const isOdd: RefineOdd = (x): x is Odd => x % 2 !== 0;
 const isPrime: RefinePrime = (x): x is Prime => [2, 5, 7].includes(x);
+const isNum: RefineNum = (x): x is Num => [2, 3, 4, 5, 6, 7, 9].includes(x);
 
 {
   /**
@@ -109,5 +113,18 @@ const isPrime: RefinePrime = (x): x is Prime => [2, 5, 7].includes(x);
     assert.strictEqual(isOddAndPrime(7), true);
     assert.strictEqual(isOddAndPrime(9), false);
     assert.strictEqual(isOddAndPrime(2), false);
+  }
+}
+
+{
+  /**
+   * Refinement.not
+   * */
+
+  {
+    const isEven = R.not(isOdd);
+    assert.strictEqual(isEven(2), true);
+    assert.strictEqual(isEven(4), true);
+    assert.strictEqual(isEven(3), false);
   }
 }
