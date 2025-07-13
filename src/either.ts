@@ -855,3 +855,25 @@ const F = { ...FunctionCore, ...FunctionStd };
     assert.deepStrictEqual(actual, "user:jeremiah");
   }
 }
+
+{
+  /**
+   * Either.reduceRight
+   * */
+
+  {
+    const sub = (x: number, y: number) => x - y;
+    const actual = F.pipe(E.of(30), E.reduceRight(10, sub));
+    assert.deepStrictEqual(actual, 20);
+  }
+
+  {
+    const prefix = " eh!";
+    const either = E.of("good morning");
+    const actual = F.pipe(
+      either,
+      E.reduceRight(prefix, (x, y) => `${x}${y}`),
+    );
+    assert.deepStrictEqual(actual, "good morning eh!");
+  }
+}
