@@ -68,4 +68,11 @@ import * as E from "fp-ts/Either";
     const expect = RA.of(42);
     assert.deepStrictEqual(actual, expect);
   }
+
+  {
+    const user: E.Either<"ErrorNotFound", string> = E.left("ErrorNotFound");
+    const actual = RA.fromEither(user);
+    const expect: readonly string[] = [];
+    assert.deepStrictEqual(actual, expect);
+  }
 }
