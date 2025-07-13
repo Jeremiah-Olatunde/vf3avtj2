@@ -1064,3 +1064,34 @@ const A = { ...ArrayCore, ...ArrayStd };
     assert.deepStrictEqual(actual, expect);
   }
 }
+
+{
+  // Either.bimap
+
+  type ErrorCode = 400 | 500;
+
+  type Response = E.Either<ErrorCode, number>;
+
+  function displayErrorCode(code: ErrorCode): string {
+    switch (code) {
+      case 400:
+        return "400:ErrorClient";
+      case 500:
+        return "500:ErrorServer";
+    }
+  }
+
+  {
+    const response: Response = E.right(42);
+    const actual = F.pipe(response, E.bimap(displayErrorCode, F.increment));
+    const expect = E.of(43);
+    assert.deepStrictEqual(actual, expect);
+  }
+
+  {
+    const response: Response = E.left(400);
+    const actual = F.pipe(response, E.bimap(displayErrorCode, F.increment));
+    const expect = E.left("400:ErrorClient");
+    assert.deepStrictEqual(actual, expect);
+  }
+}
