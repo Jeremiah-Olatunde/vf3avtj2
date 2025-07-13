@@ -690,11 +690,11 @@ const F = { ...FunctionCore, ...FunctionStd };
 }
 
 {
-  {
-    /**
-     * Either.mapLeft
-     * */
+  /**
+   * Either.mapLeft
+   * */
 
+  {
     const either: E.Either<"404" | "401" | "400", string> = E.left("404");
     const actual = F.pipe(
       either,
@@ -711,5 +711,35 @@ const F = { ...FunctionCore, ...FunctionStd };
     );
     const expect = E.left("NotFound");
     assert.deepStrictEqual(actual, expect);
+  }
+}
+
+{
+  /**
+   * Either.orElse, Either.orElseW
+   * */
+
+  {
+    type ResponseCodes = "404" | "401" | "400";
+    const serverResponse: E.Either<ResponseCodes, string> = E.left("404");
+    const uiNotFound = E.left("that user does not exist");
+    const uiUnauthorized = E.left("you can not perform this action");
+    const uiBadRequest = E.left("you've done something wrong");
+
+    const actual = F.pipe(
+      serverResponse,
+      E.orElseW((codes) => {
+        switch (codes) {
+          case "400":
+            return uiBadRequest;
+          case "401":
+            return uiUnauthorized;
+          case "404":
+            return uiNotFound;
+        }
+      }),
+    );
+
+    assert.deepStrictEqual(actual, uiNotFound);
   }
 }
