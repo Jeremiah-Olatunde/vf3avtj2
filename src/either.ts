@@ -808,3 +808,27 @@ const F = { ...FunctionCore, ...FunctionStd };
     assert.deepStrictEqual(actual, expect);
   }
 }
+
+{
+  /**
+   * Either.foldMap
+   * */
+
+  {
+    // go from Either<E, A> to  readonly A[] with foldMap
+    // i.e implement RA.fromEither using Monoid instance from  ReadonlyArray
+
+    function toArray<E, T>(either: E.Either<E, T>): readonly T[] {
+      return E.foldMap(A.getMonoid<T>())(A.of<T>)(either);
+    }
+
+    {
+      const either = E.of(42);
+      assert.deepStrictEqual(toArray(either), A.fromEither(either));
+    }
+    {
+      const either = E.left("SomeError");
+      assert.deepStrictEqual(toArray(either), A.fromEither(either));
+    }
+  }
+}
