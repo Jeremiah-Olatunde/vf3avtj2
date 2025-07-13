@@ -1,6 +1,7 @@
 import assert from "node:assert";
 import * as R from "fp-ts/Refinement";
 import * as F from "fp-ts/function";
+import * as E from "fp-ts/Either";
 
 type Success = "200" | "201";
 type ErrorServer = "500" | "501";
@@ -148,4 +149,57 @@ const isNum: RefineNum = (x): x is Num => [2, 3, 4, 5, 6, 7, 9].includes(x);
   assert.strictEqual(refine(1000), false);
   assert.strictEqual(refine(2), false);
   assert.strictEqual(refine(9), false);
+}
+
+{
+  /**
+   * Refinement.fromEitherK
+   * */
+
+  type Char =
+    | "a"
+    | "b"
+    | "c"
+    | "d"
+    | "e"
+    | "f"
+    | "g"
+    | "h"
+    | "i"
+    | "j"
+    | "k"
+    | "l"
+    | "m"
+    | "n"
+    | "o"
+    | "p"
+    | "q"
+    | "r"
+    | "s"
+    | "t"
+    | "u"
+    | "v"
+    | "w"
+    | "x"
+    | "y"
+    | "z";
+
+  type StringLen3 = `${Char}${Char}${Char}`;
+  type Validated = E.Either<"TooShort" | "TooLong", StringLen3>;
+  function isLength3(input: string): Validated {
+    if (input.length > 3) {
+      return E.left("TooLong");
+    }
+
+    if (input.length < 3) {
+      return E.left("TooShort");
+    }
+
+    return E.right(input as StringLen3);
+  }
+
+  const refine = R.fromEitherK(isLength3);
+
+  assert.strictEqual(refine("hello"), false);
+  assert.strictEqual(refine("hel"), true);
 }
