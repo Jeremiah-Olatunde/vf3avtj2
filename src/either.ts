@@ -1,5 +1,6 @@
 import assert from "node:assert";
 import * as E from "fp-ts/Either";
+import * as O from "fp-ts/Option";
 import * as R from "fp-ts/Refinement";
 import * as FunctionCore from "fp-ts/function";
 import * as FunctionStd from "fp-ts-std/Function";
@@ -1008,5 +1009,26 @@ const A = { ...ArrayCore, ...ArrayStd };
     const actual = safeGetEmail("nehemiah");
     const expect = E.left("ErrorNotFound:nehemiah");
     assert.deepStrictEqual(actual, expect);
+  }
+}
+
+{
+  /**
+   * E.liftOption
+   * */
+
+  {
+    const whenNullable = F.constant("NotEven");
+    const evenOption = (n: number) => (n % 2 === 0 ? O.some(n) : O.none);
+    const evenEither = E.liftOption(evenOption, whenNullable);
+
+    assert.deepStrictEqual(evenEither(2), E.of(2));
+    assert.deepStrictEqual(evenEither(3), E.left("NotEven"));
+  }
+
+  {
+    const eitherHead = E.liftOption(A.head, F.constant("Empty" as const));
+    assert.deepStrictEqual(eitherHead([2]), E.of(2));
+    assert.deepStrictEqual(eitherHead([]), E.left("Empty"));
   }
 }
