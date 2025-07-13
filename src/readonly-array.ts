@@ -76,3 +76,23 @@ import * as E from "fp-ts/Either";
     assert.deepStrictEqual(actual, expect);
   }
 }
+
+{
+  /**
+   * ReadonlyArray.fromOption
+   * */
+
+  {
+    const xs = RA.of(42);
+    const actual = RA.fromOption(RA.head(xs));
+    const expect = xs;
+    assert.deepStrictEqual(actual, expect);
+  }
+
+  {
+    const xs: readonly string[] = RA.empty;
+    const actual = RA.fromOption(RA.head(xs));
+    const expect = xs;
+    assert.deepStrictEqual(actual, expect);
+  }
+}
