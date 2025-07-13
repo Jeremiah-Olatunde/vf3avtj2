@@ -665,7 +665,7 @@ const F = { ...FunctionCore, ...FunctionStd };
 
 {
   /**
-   * Either.getOrElse
+   * Either.getOrElse, Either.getOrElseW
    * */
 
   {
@@ -685,6 +685,31 @@ const F = { ...FunctionCore, ...FunctionStd };
       E.getOrElse((_) => "NotFound"),
     );
     const expect = "NotFound";
+    assert.deepStrictEqual(actual, expect);
+  }
+}
+
+{
+  {
+    /**
+     * Either.mapLeft
+     * */
+
+    const either: E.Either<"404" | "401" | "400", string> = E.left("404");
+    const actual = F.pipe(
+      either,
+      E.mapLeft((error) => {
+        switch (error) {
+          case "400":
+            return "BadRequest";
+          case "401":
+            return "Unauthorized";
+          case "404":
+            return "NotFound";
+        }
+      }),
+    );
+    const expect = E.left("NotFound");
     assert.deepStrictEqual(actual, expect);
   }
 }
