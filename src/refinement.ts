@@ -128,3 +128,13 @@ const isNum: RefineNum = (x): x is Num => [2, 3, 4, 5, 6, 7, 9].includes(x);
     assert.strictEqual(isEven(3), false);
   }
 }
+
+{
+  /**
+   * Refinement.compose
+   * */
+
+  const refine = F.pipe(isResponse, R.compose(isErrorServer));
+  assert.strictEqual(refine("500"), isErrorServer("500"));
+  assert.strictEqual(refine("400"), isErrorServer("400"));
+}
