@@ -296,3 +296,40 @@ const T = { ...TCore, ...TStd };
   assert.deepStrictEqual(actual, expect);
   assert.deepStrictEqual(duration, 2);
 })();
+
+(async function () {
+  (async function () {
+    // Task.traverseArray
+
+    type User = {
+      name: string;
+      age: number;
+    };
+
+    const user = (name: string, age: number) => ({ name, age });
+
+    function fetchUser(
+      username: "jeremiah" | "nehemiah" | "roman",
+    ): Task<User> {
+      const database = {
+        jeremiah: user("jeremiah olatunde", 23),
+        nehemiah: user("nehemiah olatunde", 19),
+        roman: user("roman unuose", 22),
+      } as const;
+
+      return T.delay(1000)(T.of(database[username]));
+    }
+
+    const toFetch = ["jeremiah", "roman"] as const;
+    const task = T.traverseArray(fetchUser)(toFetch);
+
+    const commence = performance.now();
+    const actual = await T.execute(task);
+    const conclude = performance.now();
+    const duration = Math.round((conclude - commence) / 1000);
+
+    const expect = [user("jeremiah olatunde", 23), user("roman unuose", 22)];
+    assert.deepStrictEqual(actual, expect);
+    assert.deepStrictEqual(duration, 1);
+  })();
+})();
