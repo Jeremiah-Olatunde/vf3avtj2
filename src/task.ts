@@ -1,6 +1,7 @@
 import assert from "node:assert";
 
 import * as IO from "fp-ts/IO";
+import * as A from "fp-ts/Array";
 
 import * as Apply from "fp-ts/Apply";
 
@@ -397,4 +398,76 @@ const T = { ...TCore, ...TStd };
   ];
   assert.deepStrictEqual(Object.values(actual), expect);
   assert.deepStrictEqual(duration, 1);
+})();
+
+(async function () {
+  // Task.flatMap
+
+  type User = {
+    id: 0 | 1 | 2;
+    name: string;
+    age: number;
+  };
+
+  const user = (id: 0 | 1 | 2, name: string, age: number) => ({
+    id,
+    name,
+    age,
+  });
+
+  function fetchUser(username: "jeremiah" | "nehemiah" | "roman"): Task<User> {
+    const database = {
+      jeremiah: user(0, "jeremiah olatunde", 23),
+      nehemiah: user(1, "nehemiah olatunde", 19),
+      roman: user(2, "roman unuose", 22),
+    } as const;
+
+    return T.delay(1000)(T.of(database[username]));
+  }
+
+  type Order = { id: number; amount: number };
+  const order = (id: number, amount: number): Order => ({ id, amount });
+
+  function fetchOrders(id: 0 | 1 | 2): Task<Order[]> {
+    switch (id) {
+      case 0: {
+        const orders: Order[] = [order(1, 50), order(2, 10), order(3, 50)];
+        return T.delay(2000)(T.of(orders));
+      }
+      case 1: {
+        const orders: Order[] = [order(1, 10), order(2, 10)];
+        return T.delay(2000)(T.of(orders));
+      }
+      case 2: {
+        const orders: Order[] = [
+          order(1, 30),
+          order(2, 30),
+          order(3, 40),
+          order(4, 20),
+        ];
+        return T.delay(2000)(T.of(orders));
+      }
+    }
+  }
+
+  function fetchOrderCount(
+    username: "jeremiah" | "nehemiah" | "roman",
+  ): Task<number> {
+    return F.pipe(
+      fetchUser(username),
+      T.flatMap((user) => fetchOrders(user.id)),
+      T.map(A.size),
+    );
+  }
+
+  const task = fetchOrderCount("jeremiah");
+
+  const commence = performance.now();
+  const actual = await T.execute(task);
+  const conclude = performance.now();
+  const duration = Math.round((conclude - commence) / 1000);
+
+  const expect = 3;
+  assert.deepStrictEqual(actual, expect);
+  assert.deepStrictEqual(duration, 3);
 })();
