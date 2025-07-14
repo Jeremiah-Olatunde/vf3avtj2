@@ -347,3 +347,54 @@ const T = { ...TCore, ...TStd };
     assert.deepStrictEqual(duration, 2);
   })();
 })();
+
+(async function () {
+  type User = {
+    name: string;
+    age: number;
+  };
+
+  const user = (name: string, age: number) => ({ name, age });
+
+  function fetchUser(username: "jeremiah" | "nehemiah" | "roman"): Task<User> {
+    const database = {
+      jeremiah: user("jeremiah olatunde", 23),
+      nehemiah: user("nehemiah olatunde", 19),
+      roman: user("roman unuose", 22),
+    } as const;
+
+    return T.delay(1000)(T.of(database[username]));
+  }
+
+  type LogLevel = "Error" | "Warning" | "Debug";
+
+  function sendLog(level: LogLevel, message: string): Task<void> {
+    // pretend this is hitting some server endpoint
+    // console.log(`[log:${level}]`, message);
+    [level, message];
+    return T.of(undefined);
+  }
+
+  const task = F.pipe(
+    T.Do,
+    T.apS("roman", fetchUser("roman")),
+    T.tap(({ roman: user }) => sendLog("Debug", `fetched: ${user.name}`)),
+    T.apS("nehemiah", fetchUser("nehemiah")),
+    T.tap(({ nehemiah: user }) => sendLog("Debug", `fetched: ${user.name}`)),
+    T.apS("jeremiah", fetchUser("jeremiah")),
+    T.tap(({ jeremiah: user }) => sendLog("Debug", `fetched: ${user.name}`)),
+  );
+
+  const commence = performance.now();
+  const actual = await T.execute(task);
+  const conclude = performance.now();
+  const duration = Math.round((conclude - commence) / 1000);
+
+  const expect = [
+    user("roman unuose", 22),
+    user("nehemiah olatunde", 19),
+    user("jeremiah olatunde", 23),
+  ];
+  assert.deepStrictEqual(Object.values(actual), expect);
+  assert.deepStrictEqual(duration, 1);
+})();
