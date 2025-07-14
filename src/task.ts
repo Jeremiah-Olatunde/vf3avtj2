@@ -59,3 +59,18 @@ const T = { ...TCore, ...TStd };
 
   assert.deepStrictEqual(actual, expect);
 })();
+
+(async function () {
+  //  Task.bind
+
+  const actual = await F.pipe(
+    T.Do,
+    T.bind("x", () => T.of(`x`)),
+    T.bind("y", ({ x }) => T.of(`${x}y`)),
+    T.bind("z", ({ y }) => T.of(`${y}z`)),
+    T.execute,
+  );
+
+  const expect = { x: "x", y: "xy", z: "xyz" };
+  assert.deepStrictEqual(actual, expect);
+})();
