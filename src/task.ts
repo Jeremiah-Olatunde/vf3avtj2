@@ -138,3 +138,15 @@ const T = { ...TCore, ...TStd };
 
   assert.deepStrictEqual(actual, expect);
 })();
+
+(async function () {
+  //  Task.delay
+
+  const commence = performance.now();
+  const actual = await F.pipe(T.of(42), T.delay(1000), T.execute);
+  const conclude = performance.now();
+  const duration = Math.round((conclude - commence) / 1000);
+
+  assert.deepStrictEqual(actual, 42);
+  assert.deepStrictEqual(duration, 1);
+})();
