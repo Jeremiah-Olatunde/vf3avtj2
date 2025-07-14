@@ -89,3 +89,52 @@ const T = { ...TCore, ...TStd };
   const expect = { x: "x", y: "xy", z: "xyz" };
   assert.deepStrictEqual(actual, expect);
 })();
+
+(async function () {
+  // Task.let
+
+  type Person = {
+    age: number;
+    married: boolean;
+    name: string;
+    nationality: string;
+    birthYear: number;
+  };
+
+  function person(
+    name: string,
+    age: number,
+    married: boolean,
+    nationality: string,
+    birthYear: number,
+  ): Person {
+    return { name, age, married, nationality, birthYear };
+  }
+
+  const taskAge = T.of(24);
+  const taskMarried = T.of(false);
+  const taskName = T.of("jesuseun jeremiah olatunde");
+
+  const actual = await F.pipe(
+    T.Do,
+    T.apS("age", taskAge),
+    T.apS("name", taskName),
+    T.apS("married", taskMarried),
+    T.let("nationality", F.constant("nigerian")),
+    T.let("birthYear", ({ age }) => 2025 - age),
+    T.map(({ age, married, name, nationality, birthYear }) => {
+      return person(name, age, married, nationality, birthYear);
+    }),
+    T.execute,
+  );
+
+  const expect = person(
+    "jesuseun jeremiah olatunde",
+    24,
+    false,
+    "nigerian",
+    2001,
+  );
+
+  assert.deepStrictEqual(actual, expect);
+})();
