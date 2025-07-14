@@ -1,6 +1,7 @@
 import assert from "node:assert";
 
 import * as IO from "fp-ts/IO";
+import * as F from "fp-ts/function";
 
 import * as TCore from "fp-ts/Task";
 import * as TStd from "fp-ts-std/Task";
@@ -20,4 +21,37 @@ const T = { ...TCore, ...TStd };
   const task = T.fromIO(getRandom);
   const actual = await T.execute(task);
   assert.deepStrictEqual(actual, random);
+})();
+
+(async function () {
+  // Task.apS
+
+  type Person = {
+    age: number;
+    married: boolean;
+    name: string;
+  };
+
+  function person(name: string, age: number, married: boolean): Person {
+    return { name, age, married };
+  }
+
+  const taskAge = T.of(23);
+  const taskMarried = T.of(false);
+  const taskName = T.of("jesuseun jeremiah olatunde");
+
+  const actual = await F.pipe(
+    T.Do,
+    T.apS("age", taskAge),
+    T.apS("name", taskName),
+    T.apS("married", taskMarried),
+    T.map(({ age, married, name }) => {
+      return person(name, age, married);
+    }),
+    T.execute,
+  );
+
+  const expect = person("jesuseun jeremiah olatunde", 23, false);
+
+  assert.deepStrictEqual(actual, expect);
 })();
