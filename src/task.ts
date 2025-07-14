@@ -2,6 +2,8 @@ import assert from "node:assert";
 
 import * as IO from "fp-ts/IO";
 
+import * as O from "fp-ts/Option";
+
 import * as FCore from "fp-ts/function";
 import * as FStd from "fp-ts-std/Function";
 
@@ -187,5 +189,15 @@ const T = { ...TCore, ...TStd };
     const expect = person("jesuseun jeremiah olatunde", 23, false);
     assert.deepStrictEqual(actual, expect);
     assert.deepStrictEqual(duration, 2);
+  }
+
+  {
+    const commence = performance.now();
+    const actual = await T.execute(map(T.delay(1000)(T.of(42)), F.increment));
+    const conclude = performance.now();
+    const duration = Math.round((conclude - commence) / 1000);
+
+    assert.deepStrictEqual(actual, 43);
+    assert.deepStrictEqual(duration, 1);
   }
 })();
