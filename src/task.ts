@@ -10,12 +10,16 @@ import { type Task } from "fp-ts/Task";
 const T = { ...TCore, ...TStd };
 
 (async function () {
+  // Task.of
+
   const task: Task<string> = T.of("hello task");
   const actual = await T.execute(task);
   assert.deepStrictEqual(actual, "hello task");
 })();
 
 (async function () {
+  // Task.fromIO
+
   const random = Math.random(); // for testing purpose
   const getRandom: IO.IO<number> = IO.of(random);
   const task = T.fromIO(getRandom);
