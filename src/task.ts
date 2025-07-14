@@ -258,3 +258,22 @@ const T = { ...TCore, ...TStd };
     assert.deepStrictEqual(duration, 3);
   }
 })();
+
+(async function () {
+  // Task.sequenceArray
+
+  const a = T.delay(1000)(T.of("a"));
+  const b = T.delay(2000)(T.of("b"));
+  const c = T.delay(1000)(T.of("c"));
+
+  const task = T.sequenceArray([a, b, c]);
+
+  const commence = performance.now();
+  const actual = await T.execute(task);
+  const conclude = performance.now();
+  const duration = Math.round((conclude - commence) / 1000);
+
+  const expect = ["a", "b", "c"];
+  assert.deepStrictEqual(actual, expect);
+  assert.deepStrictEqual(duration, 2);
+})();
