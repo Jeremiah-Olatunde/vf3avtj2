@@ -2,7 +2,7 @@ import assert from "node:assert";
 
 import * as IO from "fp-ts/IO";
 
-import * as O from "fp-ts/Option";
+import * as Apply from "fp-ts/Apply";
 
 import * as FCore from "fp-ts/function";
 import * as FStd from "fp-ts-std/Function";
@@ -161,6 +161,7 @@ const T = { ...TCore, ...TStd };
   //  Task.AppliativePar
 
   const { ap, of, map } = T.ApplicativePar;
+  const Applicative = T.ApplicativePar;
 
   {
     type Person = {
@@ -199,5 +200,42 @@ const T = { ...TCore, ...TStd };
 
     assert.deepStrictEqual(actual, 43);
     assert.deepStrictEqual(duration, 1);
+  }
+
+  {
+    const apS = Apply.apS(Applicative);
+
+    const age = F.pipe(T.of(24), T.delay(1000));
+    const married = F.pipe(T.of(false), T.delay(2000));
+    const name = F.pipe(T.of("jesuseun jeremiah olatunde"), T.delay(3000));
+
+    type Person = {
+      age: number;
+      married: boolean;
+      name: string;
+    };
+
+    function person(name: string, age: number, married: boolean): Person {
+      return { name, age, married };
+    }
+
+    const task = F.pipe(
+      T.Do,
+      apS("name", name),
+      apS("age", age),
+      apS("married", married),
+      T.map(({ age, married, name }) => {
+        return person(name, age, married);
+      }),
+    );
+
+    const commence = performance.now();
+    const actual = await T.execute(task);
+    const conclude = performance.now();
+    const duration = Math.round((conclude - commence) / 1000);
+
+    const expect = person("jesuseun jeremiah olatunde", 24, false);
+    assert.deepStrictEqual(actual, expect);
+    assert.deepStrictEqual(duration, 3);
   }
 })();
