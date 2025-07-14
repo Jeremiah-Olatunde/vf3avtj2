@@ -238,4 +238,23 @@ const T = { ...TCore, ...TStd };
     assert.deepStrictEqual(actual, expect);
     assert.deepStrictEqual(duration, 3);
   }
+
+  {
+    const sequenceT = Apply.sequenceT(Applicative);
+
+    const age = F.pipe(T.of(24), T.delay(1000));
+    const married = F.pipe(T.of(false), T.delay(2000));
+    const name = F.pipe(T.of("jesuseun jeremiah olatunde"), T.delay(3000));
+
+    const task = sequenceT(name, age, married);
+
+    const commence = performance.now();
+    const actual = await T.execute(task);
+    const conclude = performance.now();
+    const duration = Math.round((conclude - commence) / 1000);
+
+    const expect = ["jesuseun jeremiah olatunde", 24, false] as const;
+    assert.deepStrictEqual(actual, expect);
+    assert.deepStrictEqual(duration, 3);
+  }
 })();
