@@ -140,3 +140,38 @@ const development: Context = {
     assert.deepStrictEqual(actual, expected);
   }
 }
+
+{
+  // Reader.of
+
+  // The implementation of Reader.of is F.constant
+  // constant takes a value and returns a function which in turn always returns said
+  // value when called with *no* arguments, i.e the returned value is constant
+  // Reader.of creates a reader that reads from no context (i.e no args) and returns
+  // a value. since there is no input there is only ever one possible value that the
+  // created reader can read from the context while still being deterministic
+  // i.e a constant
+
+  {
+    const of: (a: number) => R.Reader<unknown, number> = (a: number) => () => a;
+    const reader: R.Reader<unknown, number> = of(42);
+    const actual = reader(undefined);
+    const expected = 42;
+    assert.deepStrictEqual(actual, expected);
+  }
+
+  {
+    const of: (a: number) => R.Reader<unknown, number> = F.constant;
+    const reader: R.Reader<unknown, number> = of(42);
+    const actual = reader(undefined);
+    const expected = 42;
+    assert.deepStrictEqual(actual, expected);
+  }
+
+  {
+    const reader: R.Reader<unknown, number> = R.of(42);
+    const actual = reader(undefined);
+    const expected = 42;
+    assert.deepStrictEqual(actual, expected);
+  }
+}
