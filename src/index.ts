@@ -1,5 +1,6 @@
-// import "./either.js";
-// import "./semigroup.js";
-// import "./readonly-array.js";
-// import "./refinement.js";
-import "./task.js";
+// import "./modules/either.js";
+// import "./modules/semigroup.js";
+// import "./modules/readonly-array.js";
+// import "./modules/refinement.js";
+// import "./modules/task.js";
+import "./modules/reader.js";
