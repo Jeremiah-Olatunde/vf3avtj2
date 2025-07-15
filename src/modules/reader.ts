@@ -66,8 +66,28 @@ import * as F from "../lib/Function.js";
   }
 }
 
-type Env = "production" | "development" | "staging";
-type Context = { env: Env };
+type Env = "production" | "development";
+
+type ContextProduction = {
+  env: "production";
+  api: "https://jeremiah-olatunde.com";
+};
+
+type ContextDevelopment = {
+  env: "development";
+  api: "https://dev.jeremiah-olatunde.dev";
+};
+
+type Context = ContextProduction | ContextDevelopment;
+
+const production: Context = {
+  env: "production",
+  api: "https://jeremiah-olatunde.com",
+};
+const development: Context = {
+  env: "development",
+  api: "https://dev.jeremiah-olatunde.dev",
+};
 
 {
   // Reader.ask
@@ -78,17 +98,45 @@ type Context = { env: Env };
     const reader: R.Reader<Context, Context> = R.ask<Context>();
 
     {
-      const context: Context = { env: "production" };
-      const actual = reader(context);
-      const expected = context;
+      const actual = reader(production);
+      const expected = production;
       assert.deepStrictEqual(actual, expected);
     }
 
     {
-      const context: Context = { env: "development" };
-      const actual = reader(context);
-      const expected = context;
+      const actual = reader(development);
+      const expected = development;
       assert.deepStrictEqual(actual, expected);
     }
+  }
+}
+
+{
+  // Reader.asks
+
+  // The implementation is the identity function itself
+  // Motivation
+  // We want asks to return a reader that takes a context and returns a value from it
+  // a selector if you will
+  // so we write the selector function that selects our desired value from the context
+  // and pass that in to asks
+  // but if you deep it, the selector function is the reader we wanted in the first place
+  // i.e takes the current context and returns a value from it
+  // in general a Reader is literally just a single argument function
+  // but in functional programming, where every function is curried
+  // every function is a single argument function
+  const reader: R.Reader<Context, Env> = R.asks<Context, Env>(({ env }) => env);
+  const manual: R.Reader<Context, Env> = ({ env }) => env;
+
+  {
+    const actual = reader(production);
+    const expected = "production";
+    assert.deepStrictEqual(actual, expected);
+  }
+
+  {
+    const actual = manual(development);
+    const expected = "development";
+    assert.deepStrictEqual(actual, expected);
   }
 }
