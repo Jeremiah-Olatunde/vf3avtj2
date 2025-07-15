@@ -65,3 +65,30 @@ import * as F from "../lib/Function.js";
     assert.deepStrictEqual(actual, expected);
   }
 }
+
+type Env = "production" | "development" | "staging";
+type Context = { env: Env };
+
+{
+  // Reader.ask
+
+  {
+    // The implementation of R.ask is a thunk returning the identity function () => identity
+    // i.e the result of R.ask() is a Reader that "reads" the context and returns the context
+    const reader: R.Reader<Context, Context> = R.ask<Context>();
+
+    {
+      const context: Context = { env: "production" };
+      const actual = reader(context);
+      const expected = context;
+      assert.deepStrictEqual(actual, expected);
+    }
+
+    {
+      const context: Context = { env: "development" };
+      const actual = reader(context);
+      const expected = context;
+      assert.deepStrictEqual(actual, expected);
+    }
+  }
+}
